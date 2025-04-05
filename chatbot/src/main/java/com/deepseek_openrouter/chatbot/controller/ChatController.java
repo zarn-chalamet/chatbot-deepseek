@@ -7,9 +7,13 @@ import com.deepseek_openrouter.chatbot.service.ChatService;
 import com.deepseek_openrouter.chatbot.service.OpenRouterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -25,9 +29,14 @@ public class ChatController {
         this.openRouterService = openRouterService;
     }
 
+    @GetMapping()
+    public @ResponseBody List<ChatResponse> getAllChatsOfPrincipal(@AuthenticationPrincipal UserDetails userDetails){
+        return chatService.getAllChatsByUser(userDetails);
+    }
+
     @PostMapping()
-    public ResponseEntity<?> createChat(@RequestBody ChatRequest chatRequest ){
-        chatService.createNewChat(chatRequest);
+    public ResponseEntity<?> createChat(@AuthenticationPrincipal UserDetails userDetails){
+        chatService.createNewChat(userDetails);
         return ResponseEntity.ok().build();
     }
 

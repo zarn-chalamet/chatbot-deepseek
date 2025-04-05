@@ -2,9 +2,7 @@ package com.deepseek_openrouter.chatbot.security;
 
 import com.deepseek_openrouter.chatbot.model.User;
 import com.deepseek_openrouter.chatbot.model.UserRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +12,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
