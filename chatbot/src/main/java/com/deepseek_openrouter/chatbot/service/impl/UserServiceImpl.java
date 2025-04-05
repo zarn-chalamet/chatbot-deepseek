@@ -1,6 +1,7 @@
 package com.deepseek_openrouter.chatbot.service.impl;
 
 import com.deepseek_openrouter.chatbot.model.User;
+import com.deepseek_openrouter.chatbot.model.UserRole;
 import com.deepseek_openrouter.chatbot.repository.UserRepository;
 import com.deepseek_openrouter.chatbot.request.LoginRequest;
 import com.deepseek_openrouter.chatbot.request.RegisterRequest;
@@ -51,6 +52,7 @@ public class UserServiceImpl implements UserService {
         User newUser = new User();
         newUser.setName(registerRequest.getName());
         newUser.setEmail(registerRequest.getEmail());
+        newUser.setRole(UserRole.USER);
         //encode password
         newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 

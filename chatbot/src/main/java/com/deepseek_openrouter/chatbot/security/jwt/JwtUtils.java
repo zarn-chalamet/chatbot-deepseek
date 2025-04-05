@@ -33,13 +33,11 @@ public class JwtUtils {
 
     public String generateToken(UserDetailsImpl userDetails){
         String email = userDetails.getEmail();
-        String roles = userDetails.getAuthorities().stream()
-                .map(authority -> authority.getAuthority())
-                .collect(Collectors.joining(","));
+        String role = userDetails.getRole().name();
 
         return Jwts.builder()
                 .subject(email)
-                .claim("roles",roles)
+                .claim("role",role)
                 .issuedAt(new Date())
                 .expiration(new Date((new Date().getTime() + (60 * 60 * 24 * 2 * 1000))))
                 .signWith(key())

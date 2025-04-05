@@ -1,5 +1,6 @@
 package com.deepseek_openrouter.chatbot.response;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;

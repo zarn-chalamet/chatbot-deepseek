@@ -2,6 +2,7 @@ package com.deepseek_openrouter.chatbot.controller;
 
 import com.deepseek_openrouter.chatbot.request.ChatRequest;
 import com.deepseek_openrouter.chatbot.response.ChatResponse;
+import com.deepseek_openrouter.chatbot.response.MessageResponse;
 import com.deepseek_openrouter.chatbot.service.ChatService;
 import com.deepseek_openrouter.chatbot.service.OpenRouterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,8 @@ public class ChatController {
     }
 
     @PostMapping("/{chatId}")
-    public Mono<Map<String, String>> messageWithAi(@RequestBody Map<String, String> request,@PathVariable("chatId") Long chatId) {
+    public MessageResponse messageWithAi(@RequestBody Map<String, String> request, @PathVariable("chatId") Long chatId) {
         String userMessage = request.get("message");
-        return openRouterService.messageWithAI(userMessage,chatId)
-                .map(response -> Map.of("response", response));
+        return openRouterService.messageWithAI(userMessage,chatId);
     }
 }

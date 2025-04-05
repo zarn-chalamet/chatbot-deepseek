@@ -4,6 +4,7 @@ import com.deepseek_openrouter.chatbot.model.Chat;
 import com.deepseek_openrouter.chatbot.model.ChatMessage;
 import com.deepseek_openrouter.chatbot.model.Message;
 import com.deepseek_openrouter.chatbot.repository.ChatMessageRepository;
+import com.deepseek_openrouter.chatbot.response.MessageResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,7 +88,7 @@ public class OpenRouterService {
                 });
     }
 
-    public Mono<String> messageWithAI(String userMessage,Long chatId) {
+    public MessageResponse messageWithAI(String userMessage, Long chatId) {
         //find chat by chat id and save the userMessage to the chat
         Chat chat = chatService.findChatByChatId(chatId);
 
@@ -127,20 +127,48 @@ public class OpenRouterService {
                 "messages", messagesWithContext
         );
 
-        return webClient.post()
+        // Call the WebClient asynchronously and block to get the response
+        JsonNode response = webClient.post()
                 .header("Authorization", "Bearer " + apiKey)
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(JsonNode.class)
-                .map(response -> {
-                    String aiResponse = response.get("choices").get(0).get("message").get("content").asText();
-                    Message replyMessage = new Message();
-                    replyMessage.setChat(chat);
-                    replyMessage.setRole("assistant");
-                    replyMessage.setContent(aiResponse);
-                    messageService.saveMessageAndFlush(replyMessage);
-                    return aiResponse;
-                });
+                .block();  // Block here to get the actual result
+
+        // Extract the AI's response from the result
+        String aiResponse = response.get("choices").get(0).get("message").get("content").asText();
+
+        // Create a new message with the AI's response
+        Message replyMessage = new Message();
+        replyMessage.setChat(chat);
+        replyMessage.setRole("assistant");
+        replyMessage.setContent(aiResponse);
+
+        // Save the reply message
+        Message newSavedMessage = messageService.saveMessageAndFlush(replyMessage);
+
+        // Create and return a MessageResponse based on the new saved message
+        MessageResponse messageResponse = new MessageResponse();
+        messageResponse.setId(newSavedMessage.getId());
+        messageResponse.setRole(newSavedMessage.getRole());
+        messageResponse.setContent(newSavedMessage.getContent());
+        messageResponse.setCreatedAt(newSavedMessage.getCreatedAt());
+        return messageResponse;
+
+//        return webClient.post()
+//                .header("Authorization", "Bearer " + apiKey)
+//                .bodyValue(request)
+//                .retrieve()
+//                .bodyToMono(JsonNode.class)
+//                .map(response -> {
+//                    String aiResponse = response.get("choices").get(0).get("message").get("content").asText();
+//                    Message replyMessage = new Message();
+//                    replyMessage.setChat(chat);
+//                    replyMessage.setRole("assistant");
+//                    replyMessage.setContent(aiResponse);
+//                    return messageService.saveMessageAndFlush(replyMessage);
+//
+//                });
     }
 
 //    public Mono<String> chatWithAI(String userMessage) {
