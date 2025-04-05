@@ -11,4 +11,8 @@ public interface UserService {
     void registerNewUser(RegisterRequest registerRequest);
 
     JwtAuthenticationResponse authenticateUser(LoginRequest loginRequest);
+
+    User findUserByEmail(String email);
+
+    void updatePassword(User user, String newPassword);
 }

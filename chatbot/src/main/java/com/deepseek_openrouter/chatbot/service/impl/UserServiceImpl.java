@@ -75,4 +75,15 @@ public class UserServiceImpl implements UserService {
 
         return new JwtAuthenticationResponse(jwt);
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found with email : "+ email));
+    }
+
+    @Override
+    public void updatePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }
