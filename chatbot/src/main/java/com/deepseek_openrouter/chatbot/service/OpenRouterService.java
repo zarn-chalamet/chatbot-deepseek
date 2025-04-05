@@ -1,6 +1,8 @@
 package com.deepseek_openrouter.chatbot.service;
 
+import com.deepseek_openrouter.chatbot.model.Chat;
 import com.deepseek_openrouter.chatbot.model.ChatMessage;
+import com.deepseek_openrouter.chatbot.model.Message;
 import com.deepseek_openrouter.chatbot.repository.ChatMessageRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,10 +25,14 @@ public class OpenRouterService {
 
     private final WebClient webClient;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatService chatService;
+    private final MessageService messageService;
 
     @Autowired
-    public OpenRouterService(ChatMessageRepository chatMessageRepository) {
+    public OpenRouterService(ChatMessageRepository chatMessageRepository, ChatService chatService, MessageService messageService) {
         this.chatMessageRepository = chatMessageRepository;
+        this.chatService = chatService;
+        this.messageService = messageService;
         this.webClient = WebClient.builder()
                 .baseUrl("https://openrouter.ai/api/v1/chat/completions")
                 .defaultHeader("Content-Type", "application/json")
@@ -77,6 +84,61 @@ public class OpenRouterService {
                 .map(response -> {
                     String aiResponse = response.get("choices").get(0).get("message").get("content").asText();
                     chatMessageRepository.save(new ChatMessage(null, "assistant", aiResponse));
+                    return aiResponse;
+                });
+    }
+
+    public Mono<String> messageWithAI(String userMessage,Long chatId) {
+        //find chat by chat id and save the userMessage to the chat
+        Chat chat = chatService.findChatByChatId(chatId);
+
+        Message message = new Message();
+        message.setChat(chat);
+        message.setRole("user");
+        message.setContent(userMessage);
+        Message savedMessage = messageService.saveMessageAndFlush(message);
+
+        //get all the chat messages
+
+        // get messages for context
+        List<Map<String, String>> messages = chat.getMessageList()
+                .stream()
+                .map(msg -> Map.of("role", msg.getRole(), "content", msg.getContent()))
+                .toList();
+
+        System.out.println("=============================================================");
+        System.out.println(messages);
+        System.out.println("=============================================================");
+
+        List<Map<String, String>> messagesWithContext = new ArrayList<>(messages);
+        messagesWithContext.add(Map.of("role", "system", "content",
+                "Here is the chat history between the user and the assistant. Use the history to answer the latest question from the user. " +
+                        "Do not repeat any answers already given. Focus only on providing a response to the new question." +
+                        " Make sure to only refer to the necessary parts of the conversation."
+        ));
+
+        System.out.println("message with context============================================================");
+        System.out.println(messagesWithContext);
+        System.out.println("=============================================================");
+
+
+        Map<String, Object> request = Map.of(
+                "model", "deepseek/deepseek-chat",
+                "messages", messagesWithContext
+        );
+
+        return webClient.post()
+                .header("Authorization", "Bearer " + apiKey)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .map(response -> {
+                    String aiResponse = response.get("choices").get(0).get("message").get("content").asText();
+                    Message replyMessage = new Message();
+                    replyMessage.setChat(chat);
+                    replyMessage.setRole("assistant");
+                    replyMessage.setContent(aiResponse);
+                    messageService.saveMessageAndFlush(replyMessage);
                     return aiResponse;
                 });
     }
