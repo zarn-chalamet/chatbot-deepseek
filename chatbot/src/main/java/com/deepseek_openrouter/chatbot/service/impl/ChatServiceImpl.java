@@ -4,6 +4,7 @@ import com.deepseek_openrouter.chatbot.model.Chat;
 import com.deepseek_openrouter.chatbot.model.User;
 import com.deepseek_openrouter.chatbot.repository.ChatRepository;
 import com.deepseek_openrouter.chatbot.request.ChatRequest;
+import com.deepseek_openrouter.chatbot.request.UpdateTitleRequest;
 import com.deepseek_openrouter.chatbot.response.ChatResponse;
 import com.deepseek_openrouter.chatbot.response.MessageResponse;
 import com.deepseek_openrouter.chatbot.service.ChatService;
@@ -98,5 +99,17 @@ public class ChatServiceImpl implements ChatService {
                     return chatResponse;
                 }
         ).toList();
+    }
+
+    @Override
+    public void deleteChatById(Long chatId) {
+        chatRepository.deleteById(chatId);
+    }
+
+    @Override
+    public void updateChatTitle(Long chatId, UpdateTitleRequest updateTitleRequest) {
+        Chat chat = chatRepository.findById(chatId).orElseThrow(()-> new RuntimeException("No chat found with id: "+ chatId));
+        chat.setTitle(updateTitleRequest.getNewTitle());
+        chatRepository.saveAndFlush(chat);
     }
 }

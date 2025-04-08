@@ -75,7 +75,7 @@ const Login = () => {
           {/* Forgot Password Link */}
           <div className="text-right">
             <Link
-              to="/reset-pass"
+              to="/auth/request-password"
               className="text-sm text-blue-500 hover:underline focus:outline-none"
             >
               Forgot password?

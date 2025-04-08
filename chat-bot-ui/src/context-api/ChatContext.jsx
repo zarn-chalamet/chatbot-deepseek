@@ -100,6 +100,42 @@ export const ChatContextProvider = ({children}) => {
         }
     }
 
+    const deleteChatById = async (id) => {
+        try {
+            const response = await axios.delete(backendUrl+"/api/v1/chat/"+id,{
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Authorization: "Bearer "+token,
+                }
+            });
+            console.log(response);
+            await getChatList();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const updateChatTitle = async (id,newTitle) => {
+        try {
+            const response = await axios.put(backendUrl+"/api/v1/chat/"+id,
+                {
+                    newTitle
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        Authorization: "Bearer "+token,
+                    }
+                });
+            console.log(response);
+            await getChatList();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     useEffect(()=>{
 
     },[])
@@ -110,7 +146,9 @@ export const ChatContextProvider = ({children}) => {
         chatById,getChatById,
         sendMessageToAi,
         isGenerating,
-        createChat
+        createChat,
+        deleteChatById,
+        updateChatTitle
     }
 
     return (

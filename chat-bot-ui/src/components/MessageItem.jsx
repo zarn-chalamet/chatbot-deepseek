@@ -9,7 +9,7 @@ const MessageItem = ({message}) => {
 
   return (
     <div
-        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mt-2`}
         >
         <div className={`
             max-w-xs md:max-w-md lg:max-w-xl p-3 rounded-lg shadow

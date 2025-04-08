@@ -1,6 +1,7 @@
 package com.deepseek_openrouter.chatbot.controller;
 
 import com.deepseek_openrouter.chatbot.request.ChatRequest;
+import com.deepseek_openrouter.chatbot.request.UpdateTitleRequest;
 import com.deepseek_openrouter.chatbot.response.ChatResponse;
 import com.deepseek_openrouter.chatbot.response.MessageResponse;
 import com.deepseek_openrouter.chatbot.service.ChatService;
@@ -49,5 +50,17 @@ public class ChatController {
     public MessageResponse messageWithAi(@RequestBody Map<String, String> request, @PathVariable("chatId") Long chatId) {
         String userMessage = request.get("message");
         return openRouterService.messageWithAI(userMessage,chatId);
+    }
+
+    @DeleteMapping("/{chatId}")
+    public ResponseEntity<?> deleteById(@PathVariable("chatId") Long chatId){
+        chatService.deleteChatById(chatId);
+        return ResponseEntity.ok("Deleted chat by id: "+chatId);
+    }
+
+    @PutMapping("/{chatId}")
+    public ResponseEntity<?> updateTitleById(@PathVariable("chatId") Long chatId, @RequestBody UpdateTitleRequest updateTitleRequest){
+        chatService.updateChatTitle(chatId,updateTitleRequest);
+        return ResponseEntity.ok("Updated chat by id: "+chatId);
     }
 }
