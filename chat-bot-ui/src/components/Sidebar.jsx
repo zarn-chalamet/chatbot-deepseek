@@ -5,9 +5,20 @@ import {
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import ChatItem from "./ChatItem";
+import { useContext, useEffect } from 'react';
+import { ChatContext } from '../context-api/ChatContext';
 
 const Sidebar = ({isOpen,setIsOpen}) => {
   // const [isOpen, setIsOpen] = useState(true);
+  const {chatList,getChatList,createChat} = useContext(ChatContext);
+
+  const createNewChat = () => {
+    createChat();
+  }
+
+  useEffect(()=>{
+    getChatList();
+  },[])
 
   return (
     <div>
@@ -30,20 +41,17 @@ const Sidebar = ({isOpen,setIsOpen}) => {
 
           {/* New Chat Button */}
           <div className="px-4 py-3">
-            <Link
-              to="/chat/new"
-              className="flex items-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 text-sm rounded-md transition"
-            >
+            <button onClick={createNewChat} className="flex items-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 text-sm rounded-md transition w-full">
               <FiPlus className='text-white' />
               <span className='text-white'>New Chat</span>
-            </Link>
+            </button>
           </div>
 
           {/* Chat list (sample items) */}
           <div className="flex-1 overflow-y-auto px-4 space-y-2 text-sm">
             {/* right now only string. when dev put the chat object */}
-              {[1,2,3,4,5].map((chat,index) => (
-                 <ChatItem key={index} chat={"How to use ChatWise"}/>
+              {chatList.length > 0 && chatList.map((chat,index) => (
+                 <ChatItem key={index} chat={chat}/>
               ))}
           </div>
         </div>

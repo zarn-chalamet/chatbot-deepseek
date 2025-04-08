@@ -5,6 +5,7 @@ import WelcomePage from "../pages/auth/WelcomePage";
 import Login from "../pages/auth/Login";
 import SignUp from "../pages/auth/SignUp";
 import AuthLayout from "../pages/auth/AuthLayout";
+import ChatPage from "../pages/ChatPage";
 
 const router = createBrowserRouter([
     {
@@ -14,7 +15,11 @@ const router = createBrowserRouter([
             {
                 path: "/",
                 element: <Dashboard/>
-            },         
+            },
+            {
+                path: "/chat/:id",
+                element: <ChatPage/>
+            }         
         ]
     },
     {

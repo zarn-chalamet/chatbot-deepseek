@@ -1,13 +1,18 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { FiSend } from "react-icons/fi";
+import { ChatContext } from '../context-api/ChatContext';
 
-const ChatInput = () => {
+const ChatInput = ({chatId}) => {
 
+    const {sendMessageToAi} = useContext(ChatContext);
     const [message, setMessage] = useState("");
 
     const sendMessage = () => {
-
-    }
+      if (message.trim()) {
+        sendMessageToAi(chatId, message);
+        setMessage(""); // Clear input
+      }
+    };
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {

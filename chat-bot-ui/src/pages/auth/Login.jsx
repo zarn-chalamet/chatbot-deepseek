@@ -1,14 +1,39 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from '../../components/PasswordInput';
+import {AuthContext} from "../../context-api/AuthContext"
+import axios from 'axios';
 
 const Login = () => {
+
+  const {dispatch} = useContext(AuthContext);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    if(!email || !password){
+      return;
+    }
+    try {
+      const response = await axios.post(backendUrl + "/api/v1/auth/login",{
+        email,
+        password
+      });
+
+      console.log(response);
+      if(response.status == 200){
+        localStorage.setItem('token',response.data.token);
+        dispatch({type: 'auth/login'})
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
