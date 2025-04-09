@@ -10,6 +10,8 @@ export const ChatContextProvider = ({children}) => {
     const [chatList, setChatList] = useState([]);
     const [chatById, setChatById] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [currentUser,setCurrentUser] = useState(null);
+    const [createdChatId,setCreatedChatId] = useState(null);
 
     const token = localStorage.getItem('token') || null;
     
@@ -85,7 +87,7 @@ export const ChatContextProvider = ({children}) => {
 
     const createChat = async () => {
         try {
-            const response = await axios.post(backendUrl+"/api/v1/chat",{},
+            const {data} = await axios.post(backendUrl+"/api/v1/chat",{},
                 {
                 headers: {
                     "Content-Type": "application/json",
@@ -93,7 +95,8 @@ export const ChatContextProvider = ({children}) => {
                     Authorization: "Bearer "+token,
                 }
             });
-            console.log(response);
+            console.log(data);
+            setCreatedChatId(data.id);
             await getChatList();
         } catch (error) {
             console.log(error);
@@ -136,6 +139,22 @@ export const ChatContextProvider = ({children}) => {
         }
     }
 
+    const getCurrentUserData =  async () => {
+        try {
+            const {data} = await axios.get(backendUrl+"/api/v1/user/profile",
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        Authorization: "Bearer "+token,
+                    }
+                });
+            setCurrentUser(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     useEffect(()=>{
 
     },[])
@@ -146,9 +165,10 @@ export const ChatContextProvider = ({children}) => {
         chatById,getChatById,
         sendMessageToAi,
         isGenerating,
-        createChat,
+        createdChatId, createChat,
         deleteChatById,
-        updateChatTitle
+        updateChatTitle,
+        currentUser,getCurrentUserData
     }
 
     return (

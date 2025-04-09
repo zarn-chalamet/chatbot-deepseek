@@ -5,6 +5,7 @@ import com.deepseek_openrouter.chatbot.model.UserRole;
 import com.deepseek_openrouter.chatbot.repository.UserRepository;
 import com.deepseek_openrouter.chatbot.request.LoginRequest;
 import com.deepseek_openrouter.chatbot.request.RegisterRequest;
+import com.deepseek_openrouter.chatbot.response.UserDataResponse;
 import com.deepseek_openrouter.chatbot.security.UserDetailsImpl;
 import com.deepseek_openrouter.chatbot.security.jwt.JwtAuthenticationResponse;
 import com.deepseek_openrouter.chatbot.security.jwt.JwtUtils;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -85,5 +87,17 @@ public class UserServiceImpl implements UserService {
     public void updatePassword(User user, String newPassword) {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Override
+    public UserDataResponse getUserData(UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("User not found with email: "+userDetails.getUsername()));
+
+        UserDataResponse userDataResponse = new UserDataResponse();
+        userDataResponse.setName(user.getName());
+        userDataResponse.setEmail(user.getEmail());
+        userDataResponse.setCreatedAt(user.getCreatedAt());
+
+        return userDataResponse;
     }
 }

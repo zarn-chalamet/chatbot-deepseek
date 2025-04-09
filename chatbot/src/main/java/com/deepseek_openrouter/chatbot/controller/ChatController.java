@@ -3,6 +3,7 @@ package com.deepseek_openrouter.chatbot.controller;
 import com.deepseek_openrouter.chatbot.request.ChatRequest;
 import com.deepseek_openrouter.chatbot.request.UpdateTitleRequest;
 import com.deepseek_openrouter.chatbot.response.ChatResponse;
+import com.deepseek_openrouter.chatbot.response.CreatedResponse;
 import com.deepseek_openrouter.chatbot.response.MessageResponse;
 import com.deepseek_openrouter.chatbot.service.ChatService;
 import com.deepseek_openrouter.chatbot.service.OpenRouterService;
@@ -36,9 +37,8 @@ public class ChatController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createChat(@AuthenticationPrincipal UserDetails userDetails){
-        chatService.createNewChat(userDetails);
-        return ResponseEntity.ok().build();
+    public CreatedResponse createChat(@AuthenticationPrincipal UserDetails userDetails){
+        return chatService.createNewChat(userDetails);
     }
 
     @GetMapping("/{chatId}")

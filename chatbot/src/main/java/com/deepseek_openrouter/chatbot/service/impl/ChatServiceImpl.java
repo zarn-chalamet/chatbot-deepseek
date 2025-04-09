@@ -3,9 +3,9 @@ package com.deepseek_openrouter.chatbot.service.impl;
 import com.deepseek_openrouter.chatbot.model.Chat;
 import com.deepseek_openrouter.chatbot.model.User;
 import com.deepseek_openrouter.chatbot.repository.ChatRepository;
-import com.deepseek_openrouter.chatbot.request.ChatRequest;
 import com.deepseek_openrouter.chatbot.request.UpdateTitleRequest;
 import com.deepseek_openrouter.chatbot.response.ChatResponse;
+import com.deepseek_openrouter.chatbot.response.CreatedResponse;
 import com.deepseek_openrouter.chatbot.response.MessageResponse;
 import com.deepseek_openrouter.chatbot.service.ChatService;
 import com.deepseek_openrouter.chatbot.service.UserService;
@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -29,12 +29,17 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void createNewChat(UserDetails userDetails) {
+    public CreatedResponse createNewChat(UserDetails userDetails) {
         User user = userService.findUserByEmail(userDetails.getUsername());
         Chat chat = new Chat();
         chat.setUser(user);
         chat.setTitle("New Chat");
-        chatRepository.save(chat);
+        Chat createdChat = chatRepository.saveAndFlush(chat);
+
+        CreatedResponse createdResponse = new CreatedResponse();
+        createdResponse.setId(createdChat.getId());
+
+        return createdResponse;
     }
 
     @Override

@@ -3,20 +3,32 @@ import {
   FiPlus,
   FiSearch,
 } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ChatItem from "./ChatItem";
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ChatContext } from '../context-api/ChatContext';
+import SearchModal from './SearchModal';
 
 const Sidebar = ({isOpen,setIsOpen}) => {
   // const [isOpen, setIsOpen] = useState(true);
-  const {chatList,getChatList,createChat} = useContext(ChatContext);
+  const {chatList,getChatList,createdChatId,createChat} = useContext(ChatContext);
+
+  const navigate = useNavigate();
+
+  const [showSearchModal,setShowSearchModal] = useState(false);
 
   const createNewChat = () => {
     createChat();
   }
 
+   useEffect(() => {
+      if (createdChatId) {
+        navigate("/chat/" + createdChatId);
+      }
+    }, [createdChatId, navigate]);
+
   useEffect(()=>{
+    console.log(chatList);
     getChatList();
   },[])
 
@@ -25,7 +37,7 @@ const Sidebar = ({isOpen,setIsOpen}) => {
       {
         isOpen && 
 
-        <div className={`flex flex-col h-screen bg-white ${isOpen ? 'w-64' : 'w-0'} transition-all duration-300 border-r-2`}>
+        <div className={`flex flex-col h-screen bg-white  ${isOpen ? 'w-64' : 'w-0'} transition-all duration-300 border-r-2`}>
           {/* Top bar */}
           <div className="flex items-center justify-between p-4 border-gray-700 mt-3">
             <button onClick={() => setIsOpen(!isOpen)} className=" hover:text-blue">
@@ -33,9 +45,9 @@ const Sidebar = ({isOpen,setIsOpen}) => {
             </button>
             {
               isOpen && 
-              <button>
-              <FiSearch className="text-black" />
-            </button>
+              <button onClick={() => setShowSearchModal(true)}>
+                <FiSearch className="text-black" />
+              </button>
             }
           </div>
 
@@ -55,6 +67,11 @@ const Sidebar = ({isOpen,setIsOpen}) => {
               ))}
           </div>
         </div>
+      }
+
+      {
+        showSearchModal && 
+        <SearchModal setShowSearchModal={setShowSearchModal} chatList={chatList}/>
       }
     </div>
   );
