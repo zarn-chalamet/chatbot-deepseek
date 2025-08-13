@@ -58,14 +58,26 @@ public class JwtUtils {
     }
 
     public boolean validateToken(String authToken){
+
+        if (authToken == null || authToken.isBlank()) {
+            throw new IllegalArgumentException("JWT token is null or empty");
+        }
+
+        if (!authToken.contains(".") || authToken.split("\\.").length != 3) {
+            throw new IllegalArgumentException("JWT token format is invalid");
+        }
+
         try{
             Jwts.parser()
                     .verifyWith((SecretKey) key())
                     .build()
                     .parseSignedClaims(authToken);
             return true;
+        } catch (JwtException e) {
+            // JWT-specific errors
+            throw new RuntimeException("JWT validation error: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unexpected error during JWT validation", e);
         }
     }
 
