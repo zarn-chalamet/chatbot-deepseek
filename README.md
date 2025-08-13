@@ -57,10 +57,17 @@ Security
 
 Screenshots
 
-Login Page
+Welcome Page
 
-Register Page
+<img width="1912" height="842" alt="chatbot-welcome" src="https://github.com/user-attachments/assets/5afa1fed-dc20-4ee9-a988-1c87b0356b99" />
+
+
+Register/Login Page
+
+<img width="1887" height="840" alt="chatbot-signup" src="https://github.com/user-attachments/assets/3867f9ce-389c-4483-aa4d-b3a1921d767d" />
+
 
 Chat Interface
 
-Forgot Password
+<img width="1893" height="851" alt="chatbot-home" src="https://github.com/user-attachments/assets/45d09317-74ba-414e-9463-dbd33cb27435" />
+
