@@ -12,6 +12,7 @@ const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,11 +29,17 @@ const Login = () => {
       console.log(response);
       if(response.status == 200){
         localStorage.setItem('token',response.data.token);
-        dispatch({type: 'auth/login'})
+        dispatch({type: 'auth/login', payload: response.data.token})
         navigate("/");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
+      // Check if server returned 401 or 404
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setError("Wrong email or password.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     }
   }
 
@@ -40,6 +47,10 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen ">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg border-spacing-1">
         <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
+
+        {/* Display error message */}
+        {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+
         <form onSubmit={handleSubmit} className="mt-6">
           <div className="mb-4">
             <label

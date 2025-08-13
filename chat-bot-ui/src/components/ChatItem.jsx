@@ -45,6 +45,7 @@ const ChatItem = ({ chat }) => {
     }
   };
 
+
   const deleteChat = (id) => {
     setShowMenu(false);
     deleteChatById(id);
