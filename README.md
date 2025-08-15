@@ -80,9 +80,4 @@ It features a **responsive UI**, **secure authentication**, and **password reset
 
 ---
 
-## 📄 License
-This project is licensed under the MIT License.
-
----
-
 **👨‍💻 Author:** [ZarnChalamet](https://github.com/zarn-chalamet)
